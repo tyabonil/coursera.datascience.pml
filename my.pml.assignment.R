@@ -23,5 +23,8 @@ p <- prcomp(data.matrix(trc[, 8:59]), center=T, scale=T)
 summary(p)
 
 model <- train(classe ~ ., data=trc[, 8:60], method="knn", preProcess=c("pca"), trControl = trainControl(method = "cv", number=10))
+
+plot(model, main="KNN Accuracy cs Neighbours")
+
 a <- predict(model, newdata =ts)
 pml_write_files(a)
