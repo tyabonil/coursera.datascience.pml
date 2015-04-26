@@ -1,0 +1,55 @@
+---
+title: "Practical Machine Learning:Prediction Assignment Writeup"
+author: "Ty Abonil"
+date: "April 22, 2015"
+output: html_document
+---
+
+The data is read from the CSV files provided and any columns with NA values are omitted.  A comparison is made of the columns present in the training set with those in the testing set; any that are not present in the latter are removded as there is no use using features to create a model that will not be in the data to be classified.
+
+```{r}
+require("caret")
+tr <- read.csv("pml-training.csv")
+ts <- read.csv("pml-testing.csv")
+
+tr <- tr[,colSums(is.na(tr)) == 0]
+ts <- ts[,colSums(is.na(ts)) == 0]
+
+trc <- tr[, colnames(tr)[colnames(tr) %in% colnames(ts)]]
+trc$classe  <- tr$classe
+
+colnames(trc)
+```
+
+The first 7 columns are data entry-related, and highly unlikley to matter to a model.  This is noted for future consideration.
+
+A PCA analysis is then performed to validate whether dimensionality reduction through component analysis would help reduce calculation time.
+
+
+```{r}
+p <- prcomp(data.matrix(trc[, 8:59]), center=T, scale=T)
+summary(p)
+```
+
+It looks like the first 25 components account for 95% of the variance, which suggests that PCA preprocessing would be valuable.  KNN will be used as the ML algorithm as it handles real values well without presupposing domain knowledge.
+
+The "training" data is further split tnto training and validation sets, and the out of sample error estimated.  The model is subject to a 10-fold cross-validation:
+
+
+```{r}
+trn.idx <- createDataPartition(trc$classe, p=0.7, list=FALSE)
+trc.tr <- trc[trn.idx, ] ## training
+trc.ts <- trc[-trn.idx, ] ## validation
+model <- train(classe ~ ., data=trc.tr[, 8:60], method="knn", preProcess=c("pca"), trControl = trainControl(method = "cv", number=10))
+oos.error <- sum(predict(model, newdata=trc.ts) == trc.ts$classe)/nrow(trc.ts)
+model
+```
+
+The out of sample error rate is `r 1 - oos.error`, and `r model$results[which.max(model$results[, "Accuracy"]), "k"]` neighbours provide optimal classification of the training set, with `r max(model$results[, "Accuracy"])` cross validated accuracy.
+
+Finally, we use the full training set to train a model to predict our test data, expecting less than `r 20 - oos.error*20` misclassifications:
+```{r}
+model <- train(classe ~ ., data=trc[, 8:60], method="knn", preProcess=c("pca"), trControl = trainControl(method = "cv", number=10))
+a <- predict(model, newdata =ts)
+a
+```
