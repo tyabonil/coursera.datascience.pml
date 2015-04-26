@@ -161,19 +161,19 @@ model</code></pre>
 ## Pre-processing: principal component signal extraction, scaled, centered 
 ## Resampling: Cross-Validated (10 fold) 
 ## 
-## Summary of sample sizes: 12364, 12365, 12363, 12363, 12363, 12365, ... 
+## Summary of sample sizes: 12363, 12365, 12363, 12363, 12362, 12362, ... 
 ## 
 ## Resampling results across tuning parameters:
 ## 
-##   k  Accuracy   Kappa      Accuracy SD  Kappa SD  
-##   5  0.9495528  0.9361768  0.008705679  0.01102572
-##   7  0.9369587  0.9202345  0.007430714  0.00940983
-##   9  0.9248016  0.9048203  0.008265579  0.01047250
+##   k  Accuracy   Kappa      Accuracy SD  Kappa SD   
+##   5  0.9475856  0.9337003  0.006576645  0.008303555
+##   7  0.9359395  0.9189408  0.006820323  0.008638026
+##   9  0.9258921  0.9062130  0.008929531  0.011303131
 ## 
 ## Accuracy was used to select the optimal model using  the largest value.
 ## The final value used for the model was k = 5.</code></pre>
-<p>The out of sample error is 0.9631266, and 5 neighbours provide optimal classification of the training set, with 0.9495528.</p>
-<p>Finally, we use the full training set to train a model to predict our test data, expecting less than 0.7374681 misclassifications:</p>
+<p>The out of sample error rate is 0.0414613, and 5 neighbours provide optimal classification of the training set, with 0.9475856 cross validated accuracy.</p>
+<p>Finally, we use the full training set to train a model to predict our test data, expecting less than 0.8292268 misclassifications:</p>
 <pre class="r"><code>model &lt;- train(classe ~ ., data=trc[, 8:60], method=&quot;knn&quot;, preProcess=c(&quot;pca&quot;), trControl = trainControl(method = &quot;cv&quot;, number=10))
 a &lt;- predict(model, newdata =ts)
 a</code></pre>

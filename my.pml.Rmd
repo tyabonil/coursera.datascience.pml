@@ -45,7 +45,7 @@ oos.error <- sum(predict(model, newdata=trc.ts) == trc.ts$classe)/nrow(trc.ts)
 model
 ```
 
-The out of sample error is `r oos.error`, and `r model$results[which.max(model$results[, "Accuracy"]), "k"]` neighbours provide optimal classification of the training set, with `r max(model$results[, "Accuracy"])`.
+The out of sample error rate is `r 1 - oos.error`, and `r model$results[which.max(model$results[, "Accuracy"]), "k"]` neighbours provide optimal classification of the training set, with `r max(model$results[, "Accuracy"])` cross validated accuracy.
 
 Finally, we use the full training set to train a model to predict our test data, expecting less than `r 20 - oos.error*20` misclassifications:
 ```{r}
